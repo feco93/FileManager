@@ -1,5 +1,8 @@
-﻿using System;
+﻿using FileManager;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,6 +26,10 @@ namespace WpfApplication1
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        void Window1_Loaded(object sender, RoutedEventArgs e)
+        {
         }
     }
 }
