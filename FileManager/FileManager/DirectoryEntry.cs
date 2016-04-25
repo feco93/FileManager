@@ -26,8 +26,6 @@ namespace FileManager
         private ImageSource _icon;
         private EntryType _type;
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
         public DirectoryEntry(string name, string fullname, string ext, string size, DateTime date, ImageSource image, EntryType type)
         {
             _name = name;

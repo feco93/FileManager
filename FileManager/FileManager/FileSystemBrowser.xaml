@@ -11,7 +11,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition />
         </Grid.RowDefinitions>
-        <ListView x:Name="fileSystemView" Grid.Row="1" ItemsSource="{Binding}">
+        <ListView x:Name="fileSystemView" Grid.Row="1" AllowDrop="True" ItemsSource="{Binding}" MouseMove="FileView_MouseMove" MouseLeftButtonDown="FileView_LeftButtonDown" Drop="fileSystemView_Drop" KeyDown="fileSystemView_KeyDown">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Name" Width="Auto">
