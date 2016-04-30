@@ -30,16 +30,55 @@ namespace FileManager
                 FileAttributes attr = File.GetAttributes(source);
                 if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
                 {
+                    var sourceDir = new DirectoryInfo(source);
+                    await CopyDirectoryAsync(sourceDir.FullName, Path.Combine(DestinationPath, sourceDir.Name), true);
                 }
                 else
                 {
                     var sourceFile = new FileInfo(source);
                     UpdateCopyFromLabel(source);
                     UpdateCopyToLabel(Path.Combine(DestinationPath, sourceFile.Name));
-                    await CopyFileAsync(sourceFile, new Progress<int>(percent => FileCopyPrograssBar.Value = percent));
+                    var destinationDir = new DirectoryInfo(DestinationPath);
+                    await CopyFileAsync(sourceFile, destinationDir, new Progress<int>(percent => FileCopyPrograssBar.Value = percent));
                 }
             }
             Close();
+        }
+
+        private async Task CopyDirectoryAsync(string sourceDirName, string destDirName, bool copySubDirs)
+        {
+            var dir = new DirectoryInfo(sourceDirName);
+            var destinationDir = new DirectoryInfo(destDirName);
+
+            if (!dir.Exists)
+            {
+                throw new DirectoryNotFoundException(
+                    "Source directory does not exist or could not be found: "
+                    + sourceDirName);
+            }
+
+            DirectoryInfo[] dirs = dir.GetDirectories();
+            if (!Directory.Exists(destinationDir.FullName))
+            {
+                Directory.CreateDirectory(destinationDir.FullName);
+            }
+
+            FileInfo[] files = dir.GetFiles();
+            foreach (FileInfo file in files)
+            {
+                UpdateCopyFromLabel(file.FullName);
+                UpdateCopyToLabel(Path.Combine(destDirName, file.Name));
+                await CopyFileAsync(file, destinationDir, new Progress<int>(percent => FileCopyPrograssBar.Value = percent));
+            }
+            
+            if (copySubDirs)
+            {
+                foreach (DirectoryInfo subdir in dirs)
+                {
+                    string temppath = Path.Combine(destDirName, subdir.Name);
+                    await CopyDirectoryAsync(subdir.FullName, temppath, copySubDirs);
+                }
+            }
         }
 
         private void UpdateCopyFromLabel(string source)
@@ -52,13 +91,13 @@ namespace FileManager
             CopyTo.Content = string.Format("Copy to: {0}", destination);
         }
 
-        private async Task CopyFileAsync(FileInfo sourceFile, IProgress<int> progress)
+        private async Task CopyFileAsync(FileInfo sourceFile, DirectoryInfo destinationDir, IProgress<int> progress)
         {
             using (FileStream SourceStream = File.Open(sourceFile.FullName, FileMode.Open))
             {
-                using (FileStream DestinationStream = File.Create(Path.Combine(DestinationPath, sourceFile.Name)))
+                using (FileStream DestinationStream = File.Create(Path.Combine(destinationDir.FullName, sourceFile.Name)))
                 {
-                    int bufferSize = 2048;
+                    int bufferSize = 4096;
                     int totalRead = 0;
                     while (true)
                     {

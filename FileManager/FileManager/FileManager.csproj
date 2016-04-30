@@ -80,13 +80,14 @@
     <Compile Include="CopyDialog\CopyDialog.xaml.cs">
       <DependentUpon>CopyDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="DirectoryEntry.cs" />
+    <Compile Include="FileSystemEntry.cs" />
     <Compile Include="DriveChooser\DriveChooserDialog.xaml.cs">
       <DependentUpon>DriveChooserDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="FileSystemBrowser.xaml.cs">
       <DependentUpon>FileSystemBrowser.xaml</DependentUpon>
     </Compile>
+    <Compile Include="FileSystemView\FileSystemView.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -125,6 +126,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\Folder.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\LeftUp.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

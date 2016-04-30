@@ -11,8 +11,13 @@
             <RowDefinition Height="Auto" />
             <RowDefinition />
         </Grid.RowDefinitions>
-        <ListView x:Name="fileSystemView" Grid.Row="1" AllowDrop="True" ItemsSource="{Binding}" MouseMove="FileView_MouseMove" MouseLeftButtonDown="FileView_LeftButtonDown" Drop="fileSystemView_Drop" KeyDown="fileSystemView_KeyDown">
-            <ListView.View>
+        <local:FileSystemView Focusable="False" x:Name="fileSystemView" SelectionMode="Extended" Grid.Row="1" AllowDrop="True" ItemsSource="{Binding}" MouseMove="FileView_MouseMove" Drop="fileSystemView_Drop" KeyDown="fileSystemView_KeyDown" PreviewMouseLeftButtonDown="fileSystemView_PreviewMouseLeftButtonDown">
+            <local:FileSystemView.Resources>
+                <ContextMenu x:Key="ItemContextMenu">
+                    <MenuItem Header="Delete" Click="MenuItem_Click"/>
+                </ContextMenu>
+            </local:FileSystemView.Resources>
+            <local:FileSystemView.View>
                 <GridView>
                     <GridViewColumn Header="Name" Width="Auto">
                         <GridViewColumn.CellTemplate>
@@ -28,14 +33,18 @@
                     <GridViewColumn Header="Size" DisplayMemberBinding="{Binding Size}" Width="Auto"/>
                     <GridViewColumn Header="Date" DisplayMemberBinding="{Binding Date}" Width="Auto"/>
                 </GridView>
-            </ListView.View>
-            <ListView.ItemContainerStyle>
+            </local:FileSystemView.View>
+            <local:FileSystemView.ItemContainerStyle>
                 <Style>
                     <EventSetter Event="ListViewItem.MouseDoubleClick" Handler="listViewItem_MouseDoubleClick"/>
+                    <EventSetter Event="ListViewItem.PreviewMouseRightButtonDown" Handler="listViewItem_MouseRightButtonDown"/>
+                    <Setter Property="ListViewItem.ContextMenu" Value="{StaticResource ItemContextMenu}" />
                 </Style>
-            </ListView.ItemContainerStyle>
-        </ListView>
-        <ComboBox Grid.Row="0" SelectionChanged="discCb_SelectionChanged" x:Name="discCb" HorizontalAlignment="Left" VerticalAlignment="Top" Width="65"/>
+            </local:FileSystemView.ItemContainerStyle>
+        </local:FileSystemView>
+        <ComboBox Focusable="False" Grid.Row="0" SelectionChanged="discCb_SelectionChanged" x:Name="discCb" HorizontalAlignment="Left" VerticalAlignment="Top" Width="65" Height="25"/>
+        <Button Focusable="False" Grid.Row="0" x:Name="ParentPathBtn" Content=".." HorizontalAlignment="Right" VerticalAlignment="Top" Width="30" Height="25" PreviewMouseLeftButtonUp="ParentPathBtn_PreviewMouseLeftButtonUp"/>
+        <Button Focusable="False" Grid.Row="0" x:Name="RootPathBtn" Content="\" HorizontalAlignment="Right" VerticalAlignment="Top" Width="30" Height="25" Margin="0,0,30,0" PreviewMouseLeftButtonUp="RootPathBtn_PreviewMouseLeftButtonUp"/>
 
     </Grid>
 </UserControl>
