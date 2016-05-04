@@ -2,29 +2,49 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:FileManager"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:self="clr-namespace:FileManager"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300">
+             d:DesignHeight="300" d:DesignWidth="300"
+             Focusable="True">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition />
         </Grid.RowDefinitions>
-        <local:FileSystemView Focusable="False" x:Name="fileSystemView" SelectionMode="Extended" Grid.Row="1" AllowDrop="True" ItemsSource="{Binding}" MouseMove="FileView_MouseMove" Drop="fileSystemView_Drop" KeyDown="fileSystemView_KeyDown" PreviewMouseLeftButtonDown="fileSystemView_PreviewMouseLeftButtonDown">
-            <local:FileSystemView.Resources>
+        <ListView Focusable="True" x:Name="fileSystemView" SelectionMode="Extended" Grid.Row="1" AllowDrop="True" ItemsSource="{Binding}" Drop="fileSystemView_Drop" KeyDown="fileSystemView_KeyDown" PreviewMouseLeftButtonDown="fileSystemView_PreviewMouseLeftButtonDown" PreviewMouseMove="fileSystemView_PreviewMouseMove">
+            <ListView.CommandBindings>
+                <CommandBinding Command="Delete" Executed="CommandBinding_Executed" />
+                <CommandBinding Command="Copy" Executed="CommandBinding_Executed" />
+                <CommandBinding Command="Paste" Executed="CommandBinding_Executed" />
+                <CommandBinding Command="self:FileSystemCommands.NewFile" Executed="CommandBinding_Executed" />
+                <CommandBinding Command="self:FileSystemCommands.NewFolder" Executed="CommandBinding_Executed" />
+                <CommandBinding Command="self:FileSystemCommands.Rename" Executed="CommandBinding_Executed" />
+            </ListView.CommandBindings>
+            <ListView.Resources>
                 <ContextMenu x:Key="ItemContextMenu">
-                    <MenuItem Header="Delete" Click="MenuItem_Click"/>
+                    <MenuItem Command="Copy"/>
+                    <MenuItem Command="Delete"/>
+                    <MenuItem Command="self:FileSystemCommands.Rename" />
                 </ContextMenu>
-            </local:FileSystemView.Resources>
-            <local:FileSystemView.View>
+            </ListView.Resources>
+            <ListView.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Command="Paste" />
+                    <MenuItem Header="New">
+                        <MenuItem Command="self:FileSystemCommands.NewFile" />
+                        <MenuItem Command="self:FileSystemCommands.NewFolder" />
+                    </MenuItem>
+                </ContextMenu>
+            </ListView.ContextMenu>
+            <ListView.View>               
                 <GridView>
                     <GridViewColumn Header="Name" Width="Auto">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
                                     <Image Width="16" Height="16" Source="{Binding Icon}"/>
-                                    <TextBlock Text="{Binding Name}"/>
+                                    <TextBlock Text="{Binding DisplayName}"/>                                    
                                 </StackPanel>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
@@ -33,15 +53,14 @@
                     <GridViewColumn Header="Size" DisplayMemberBinding="{Binding Size}" Width="Auto"/>
                     <GridViewColumn Header="Date" DisplayMemberBinding="{Binding Date}" Width="Auto"/>
                 </GridView>
-            </local:FileSystemView.View>
-            <local:FileSystemView.ItemContainerStyle>
+            </ListView.View>
+            <ListView.ItemContainerStyle>
                 <Style>
-                    <EventSetter Event="ListViewItem.MouseDoubleClick" Handler="listViewItem_MouseDoubleClick"/>
-                    <EventSetter Event="ListViewItem.PreviewMouseRightButtonDown" Handler="listViewItem_MouseRightButtonDown"/>
+                    <EventSetter Event="ListViewItem.MouseDoubleClick" Handler="listViewItem_MouseDoubleClick"/>                    
                     <Setter Property="ListViewItem.ContextMenu" Value="{StaticResource ItemContextMenu}" />
                 </Style>
-            </local:FileSystemView.ItemContainerStyle>
-        </local:FileSystemView>
+            </ListView.ItemContainerStyle>
+        </ListView>
         <ComboBox Focusable="False" Grid.Row="0" SelectionChanged="discCb_SelectionChanged" x:Name="discCb" HorizontalAlignment="Left" VerticalAlignment="Top" Width="65" Height="25"/>
         <Button Focusable="False" Grid.Row="0" x:Name="ParentPathBtn" Content=".." HorizontalAlignment="Right" VerticalAlignment="Top" Width="30" Height="25" PreviewMouseLeftButtonUp="ParentPathBtn_PreviewMouseLeftButtonUp"/>
         <Button Focusable="False" Grid.Row="0" x:Name="RootPathBtn" Content="\" HorizontalAlignment="Right" VerticalAlignment="Top" Width="30" Height="25" Margin="0,0,30,0" PreviewMouseLeftButtonUp="RootPathBtn_PreviewMouseLeftButtonUp"/>

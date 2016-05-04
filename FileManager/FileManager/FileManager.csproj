@@ -35,6 +35,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -57,6 +60,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="RenameDialog\RenameDialog.xaml.cs">
+      <DependentUpon>RenameDialog.xaml</DependentUpon>
+    </Compile>
     <Page Include="CopyDialog\CopyDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -80,6 +86,7 @@
     <Compile Include="CopyDialog\CopyDialog.xaml.cs">
       <DependentUpon>CopyDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="FileSystemCommands.cs" />
     <Compile Include="FileSystemEntry.cs" />
     <Compile Include="DriveChooser\DriveChooserDialog.xaml.cs">
       <DependentUpon>DriveChooserDialog.xaml</DependentUpon>
@@ -87,14 +94,13 @@
     <Compile Include="FileSystemBrowser.xaml.cs">
       <DependentUpon>FileSystemBrowser.xaml</DependentUpon>
     </Compile>
-    <Compile Include="FileSystemView\FileSystemView.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Themes\Generic.xaml">
-      <Generator>MSBuild:Compile</Generator>
+    <Page Include="RenameDialog\RenameDialog.xaml">
       <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
@@ -115,6 +121,9 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="app.manifest">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

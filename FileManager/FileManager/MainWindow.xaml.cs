@@ -30,6 +30,7 @@ namespace WpfApplication1
 
         void Window1_Loaded(object sender, RoutedEventArgs e)
         {
+            MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
         }
     }
 }
