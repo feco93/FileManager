@@ -31,10 +31,9 @@ namespace FileManager
             {
                 _actualPath = value;
 
+                fileSystemView.DataContext = GetEntries(ActualPath);
                 watcher.Path = ActualPath;
                 watcher.EnableRaisingEvents = true;
-
-                fileSystemView.DataContext = GetEntries(ActualPath);
             }
         }
 
@@ -74,10 +73,13 @@ namespace FileManager
             try
             {
                 ActualPath = newPath;
+                fileSystemView.Focus();
             }
             catch (IOException exc)
             {
                 var dialog = new DriveChooserDialog(exc.Message);
+                dialog.Owner = Window.GetWindow(this);
+                dialog.WindowStartupLocation = WindowStartupLocation.CenterOwner;
                 dialog.driveCb.SelectedIndex = discCb.SelectedIndex;
                 bool? dialogResult = dialog.ShowDialog();
                 while (dialogResult == true && discCb.SelectedItem.Equals(dialog.driveCb.SelectedItem.ToString()))
@@ -111,7 +113,7 @@ namespace FileManager
                            IntPtr.Zero,
                            Int32Rect.Empty,
                            BitmapSizeOptions.FromEmptyOptions());
-                FileSystemEntry d = new FileSystemEntry(directoryInfo.Parent, source);
+                FileSystemEntry d = new FileSystemEntry(directoryInfo.Parent, source, false);
                 d.DisplayName = "[..]";
                 entries.Add(d);
             }
@@ -285,24 +287,33 @@ namespace FileManager
             {
                 DeleteSelectedFiles();
             }
-            if (command == ApplicationCommands.Copy)
+            if (command == ApplicationCommands.Copy || command == ApplicationCommands.Cut)
             {
                 var files = new StringCollection();
                 DataObject data = new DataObject();
                 foreach (FileSystemEntry entry in fileSystemView.SelectedItems)
                 {
-                    if (entry.DisplayName.Equals(".."))
+                    if (!entry.IsEditable)
                         continue;
                     files.Add(entry.Fullpath);
                 }
+
+                if (files.Count == 0)
+                    return;
+
                 data.SetFileDropList(files);
-                data.SetData("Preferred DropEffect", DragDropEffects.Copy);
+                var dragDropEffect = command == ApplicationCommands.Copy ? DragDropEffects.Copy : DragDropEffects.Move;
+                data.SetData("Preferred DropEffect", dragDropEffect);
 
                 Clipboard.Clear();
                 Clipboard.SetDataObject(data, true);
             }
             if (command == ApplicationCommands.Paste)
             {
+                if (!Clipboard.ContainsFileDropList())
+                {
+                    return;
+                }
                 string[] sources = new string[Clipboard.GetFileDropList().Count];
                 Clipboard.GetFileDropList().CopyTo(sources, 0);
                 var dialog = new CopyDialog(ActualPath, sources);
@@ -326,7 +337,7 @@ namespace FileManager
             if (command == FileSystemCommands.Rename)
             {
                 var SelectedItem = fileSystemView.SelectedItem as FileSystemEntry;
-                if (SelectedItem == null)
+                if (SelectedItem == null || !SelectedItem.IsEditable)
                 {
                     return;
                 }
@@ -340,23 +351,51 @@ namespace FileManager
             }
 
         }
+
+        void CmdCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            var SelectedItem = fileSystemView.SelectedItem as FileSystemEntry;
+            if (SelectedItem.IsEditable)
+                e.CanExecute = true;
+        }
+
         private void CreateNewFile()
         {
             var dialog = new RenameDialog("New file:");
+            dialog.Owner = Window.GetWindow(this);
+            dialog.WindowStartupLocation = WindowStartupLocation.CenterOwner;
             var dialogResult = dialog.ShowDialog();
             if (dialogResult == true)
             {
-                File.Create(Path.Combine(ActualPath, dialog.Input.Text));
+                try
+                {
+                    using (var fileStream = File.Create(Path.Combine(ActualPath, dialog.Input.Text)))
+                    {
+                    }
+                }                
+                catch (Exception exc)
+                {
+                    MessageBox.Show(exc.Message, "Error");
+                }
             }
         }
 
         private void CreateNewFolder()
         {
             var dialog = new RenameDialog("New folder:");
+            dialog.Owner = Window.GetWindow(this);
+            dialog.WindowStartupLocation = WindowStartupLocation.CenterOwner;
             var dialogResult = dialog.ShowDialog();
             if (dialogResult == true)
             {
-                Directory.CreateDirectory(Path.Combine(ActualPath, dialog.Input.Text));
+                try
+                {
+                    Directory.CreateDirectory(Path.Combine(ActualPath, dialog.Input.Text));
+                }
+                catch (Exception exc)
+                {
+                    MessageBox.Show(exc.Message, "Error");
+                }
             }
         }
     }

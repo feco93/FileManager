@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using System.Windows.Media;
 
@@ -54,9 +55,9 @@ namespace FileManager
             }
         }
 
-        public DateTime Date
+        public string Date
         {
-            get { return EntryInfo.LastWriteTime; }
+            get { return EntryInfo.LastWriteTime.ToString("yyyy.MM.dd HH:mm"); }
         }
 
         public ImageSource Icon
@@ -82,7 +83,9 @@ namespace FileManager
             get { return EntryInfo is DirectoryInfo; }
         }
 
-        public FileSystemEntry(FileSystemInfo info, ImageSource image)
+        public bool IsEditable { get; private set; }
+
+        public FileSystemEntry(FileSystemInfo info, ImageSource image, bool editable = true)
         {
             EntryInfo = info;
             Icon = image;
@@ -90,11 +93,19 @@ namespace FileManager
             {
                 DisplayName = EntryInfo.Name;
             }
-            DisplayName = Path.GetFileNameWithoutExtension(EntryInfo.FullName);
+            else
+            {
+                DisplayName = Path.GetFileNameWithoutExtension(EntryInfo.FullName);
+            }            
+            IsEditable = editable;
         }        
 
         public void Delete()
         {
+            if (!IsEditable)
+            {
+                throw new InvalidOperationException("The file system entry is not editable");
+            }
             if (EntryInfo is DirectoryInfo)
             {
                 var info = EntryInfo as DirectoryInfo;
@@ -109,6 +120,10 @@ namespace FileManager
 
         public void Rename(string newName)
         {
+            if (!IsEditable)
+            {
+                throw new InvalidOperationException("The file system entry is not editable");
+            }
             if (IsDirectory)
             {
                 var info = EntryInfo as DirectoryInfo;

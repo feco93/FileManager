@@ -60,6 +60,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="FileSystem\FileSystemMethods.cs" />
     <Compile Include="RenameDialog\RenameDialog.xaml.cs">
       <DependentUpon>RenameDialog.xaml</DependentUpon>
     </Compile>
@@ -71,7 +72,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="FileSystemBrowser.xaml">
+    <Page Include="FileSystem\FileSystemBrowser.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -86,12 +87,12 @@
     <Compile Include="CopyDialog\CopyDialog.xaml.cs">
       <DependentUpon>CopyDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="FileSystemCommands.cs" />
-    <Compile Include="FileSystemEntry.cs" />
+    <Compile Include="FileSystem\FileSystemCommands.cs" />
+    <Compile Include="FileSystem\FileSystemEntry.cs" />
     <Compile Include="DriveChooser\DriveChooserDialog.xaml.cs">
       <DependentUpon>DriveChooserDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="FileSystemBrowser.xaml.cs">
+    <Compile Include="FileSystem\FileSystemBrowser.xaml.cs">
       <DependentUpon>FileSystemBrowser.xaml</DependentUpon>
     </Compile>
     <Compile Include="MainWindow.xaml.cs">

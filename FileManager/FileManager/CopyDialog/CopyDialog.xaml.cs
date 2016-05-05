@@ -36,10 +36,8 @@ namespace FileManager
                 else
                 {
                     var sourceFile = new FileInfo(source);
-                    UpdateCopyFromLabel(source);
-                    UpdateCopyToLabel(Path.Combine(DestinationPath, sourceFile.Name));
                     var destinationDir = new DirectoryInfo(DestinationPath);
-                    await CopyFileAsync(sourceFile, destinationDir, new Progress<int>(percent => FileCopyPrograssBar.Value = percent));
+                    await CopyFileAsync(sourceFile, destinationDir);
                 }
             }
             Close();
@@ -66,9 +64,7 @@ namespace FileManager
             FileInfo[] files = dir.GetFiles();
             foreach (FileInfo file in files)
             {
-                UpdateCopyFromLabel(file.FullName);
-                UpdateCopyToLabel(Path.Combine(destDirName, file.Name));
-                await CopyFileAsync(file, destinationDir, new Progress<int>(percent => FileCopyPrograssBar.Value = percent));
+                await CopyFileAsync(file, destinationDir);
             }
             
             if (copySubDirs)
@@ -81,6 +77,21 @@ namespace FileManager
             }
         }
 
+        private async Task CopyFileAsync(FileInfo source, DirectoryInfo destinationDir)
+        {
+            try
+            {
+                UpdateCopyFromLabel(source.FullName);
+                UpdateCopyToLabel(Path.Combine(destinationDir.FullName, source.Name));
+                await FileSystemMethods.CopyFileAsync(source, destinationDir,
+                    new Progress<int>(percent => FileCopyPrograssBar.Value = percent));
+            }
+            catch (Exception exc)
+            {
+                MessageBox.Show(exc.Message, "Error");
+            }            
+        }
+
         private void UpdateCopyFromLabel(string source)
         {
             CopyFrom.Content = string.Format("Copy from: {0}", source);
@@ -90,30 +101,6 @@ namespace FileManager
         {
             CopyTo.Content = string.Format("Copy to: {0}", destination);
         }
-
-        private async Task CopyFileAsync(FileInfo sourceFile, DirectoryInfo destinationDir, IProgress<int> progress)
-        {
-            using (FileStream SourceStream = File.Open(sourceFile.FullName, FileMode.Open))
-            {
-                using (FileStream DestinationStream = File.Create(Path.Combine(destinationDir.FullName, sourceFile.Name)))
-                {
-                    int bufferSize = 4096;
-                    int totalRead = 0;
-                    while (true)
-                    {
-                        byte[] result = new byte[bufferSize];
-                        int readedBytes = await SourceStream.ReadAsync(result, 0, bufferSize);
-                        if (readedBytes == 0)
-                            break;                        
-                        await DestinationStream.WriteAsync(result, 0, readedBytes);
-                        totalRead += readedBytes;
-                        if (progress != null)
-                        {
-                            progress.Report((int)(totalRead * 100 / SourceStream.Length));
-                        }                        
-                    }
-                }
-            }
-        }
+        
     }
 }

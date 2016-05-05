@@ -14,16 +14,18 @@
         </Grid.RowDefinitions>
         <ListView Focusable="True" x:Name="fileSystemView" SelectionMode="Extended" Grid.Row="1" AllowDrop="True" ItemsSource="{Binding}" Drop="fileSystemView_Drop" KeyDown="fileSystemView_KeyDown" PreviewMouseLeftButtonDown="fileSystemView_PreviewMouseLeftButtonDown" PreviewMouseMove="fileSystemView_PreviewMouseMove">
             <ListView.CommandBindings>
-                <CommandBinding Command="Delete" Executed="CommandBinding_Executed" />
+                <CommandBinding Command="Delete" Executed="CommandBinding_Executed" CanExecute="CmdCanExecute" />
                 <CommandBinding Command="Copy" Executed="CommandBinding_Executed" />
                 <CommandBinding Command="Paste" Executed="CommandBinding_Executed" />
+                <CommandBinding Command="Cut" Executed="CommandBinding_Executed" />
                 <CommandBinding Command="self:FileSystemCommands.NewFile" Executed="CommandBinding_Executed" />
                 <CommandBinding Command="self:FileSystemCommands.NewFolder" Executed="CommandBinding_Executed" />
-                <CommandBinding Command="self:FileSystemCommands.Rename" Executed="CommandBinding_Executed" />
+                <CommandBinding Command="self:FileSystemCommands.Rename" Executed="CommandBinding_Executed" CanExecute="CmdCanExecute" />
             </ListView.CommandBindings>
             <ListView.Resources>
                 <ContextMenu x:Key="ItemContextMenu">
                     <MenuItem Command="Copy"/>
+                    <MenuItem Command="Cut" />
                     <MenuItem Command="Delete"/>
                     <MenuItem Command="self:FileSystemCommands.Rename" />
                 </ContextMenu>
